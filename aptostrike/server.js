@@ -1,7 +1,7 @@
 const { createServer } = require('https')
-const fs = require('fs')
 const { parse } = require('url')
 const next = require('next')
+const fs = require('fs')
 
 const dev = false
 const port = process.env.PORT || 443
@@ -19,12 +19,13 @@ app.prepare().then(() => {
     const parsedUrl = parse(req.url, true)
     const { pathname, query } = parsedUrl
 
-    if (pathname === '/a') {
-      app.render(req, res, '/a', query)
-    } else if (pathname === '/b') {
-      app.render(req, res, '/b', query)
-    } else {
-      handle(req, res, parsedUrl)
+    switch (pathname) {
+      case '/a':
+        return app.render(req, res, '/a', query)
+      case '/b':
+        return app.render(req, res, '/b', query)
+      default:
+        handle(req, res, parsedUrl)
     }
   }).listen(port, (err) => {
     if (err) throw err

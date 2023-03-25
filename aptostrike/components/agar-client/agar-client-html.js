@@ -1,8 +1,7 @@
-export const renderInner = () => ({
+export const renderInner = (server) => ({
     __html: `
-
+    
     <link href="https://fonts.googleapis.com/css?family=Ubuntu:700" rel="stylesheet" type="text/css">
-    <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet"> -->
 
     <div class='popUp popUp--connect' id="connecting">
         <h2 class='popUp__title'>Connecting</h2>
@@ -15,10 +14,10 @@ export const renderInner = () => ({
 
             <!-- <input id="nick" disabled class="form-control" placeholder="Nickname" maxlength="15"> -->
             <select style="display:none" id="gamemode" class="form-control" onchange="setserver(this.value)" required>
-                <option value="ws.aptostrike.io" selected>ws.aptostrike.io</option>
+                <option value="${server}" selected>ws.aptostrike.space</option>
             </select>
 
-            <button class="popUp__btn btn btn--wide btn-play btn-primary btn-needs-server" id="play-btn">Play</button>
+            <button class="popUp__btn btn btn--wide btn--center btn-play btn-primary btn-needs-server" id="play-btn">Play</button>
 
             <div id="settings"></div>
 
@@ -34,12 +33,15 @@ export const renderInner = () => ({
     <div id="mobileStuff" style="display: none;">
         <div id="touchpad"></div>
         <div id="touchCircle" style="display: none;"></div>
-        <img src="/img/split.png" id="splitBtn">
-        <img src="/img/eject.png" id="ejectBtn">
+        <img src="/img/game-split.png" id="splitBtn">
+        <img src="/img/game-eject.png" id="ejectBtn">
     </div>
 
     <canvas id="canvas" width="800" height="600"></canvas>
-    <input type="text" id="chat_textbox" placeholder="Press enter to chat" maxlength="200">
-    <div style="font-family:'Ubuntu'">&nbsp;</div>
 
+    <img style="position:fixed;" id="canvas-bg" src="/img/bg.jpg" />
+    <img style="position:fixed;" id="food-png" src="/img/game-food.png" />
+
+    <input class="chatInput" id="chat_textbox" type="text" placeholder="Press enter to chat" maxlength="200">
+    <div style="font-family:'Ubuntu'">&nbsp;</div>
 `})

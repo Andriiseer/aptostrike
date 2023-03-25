@@ -1,12 +1,7 @@
-.headerLp {
-    height: auto;
-}
-
 .lp {
-
-    &__logo {
-        margin-top: 60px;
-    }
+    display: flex;
+    align-items: center;
+    height: 100vh;
 
     &__text {
         padding: 0 50px;
@@ -18,11 +13,20 @@
     &__btn {
         margin-top: 50px;
     }
-}
 
-.bgVideo {
-    // background: url(video-poster.jpg) no-repeat #94a233;
-    // background-size: cover;
+    &__bg {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: -1;
+    }
+
+    &__video {
+        min-height: 100%;
+    }
 
     &__overlay {
         position: fixed;
@@ -33,27 +37,17 @@
         width: 100%;
         background: rgba(0, 0, 0, 0.2);
         overflow: hidden;
-        z-index: -1;
-    }
-
-    &__video {
-        position: fixed;
-        right: 0;
-        bottom: 0;
-        min-width: 100%;
-        min-height: 100%;
-        z-index: -1;
+        z-index: 0;
     }
 }
 
 
 
-@media (max-width: 767px) {
-    .bgVideo {
-        background: url('/img/lp-bg-poster.png') center center / cover no-repeat;
-
-        &__video {
-            display: none;
+@media (max-width: 768px) {
+    .lp {
+        &__text {
+            padding: 20px 0 0;
+            font-size: 22px;
         }
     }
 }

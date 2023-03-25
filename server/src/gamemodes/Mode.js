@@ -1,5 +1,3 @@
-const signalR = require("@microsoft/signalr");
-
 class Mode {
     constructor() {
         this.ID = -1;
@@ -15,6 +13,19 @@ class Mode {
         // Called when the server starts
         server.run = true;
     }
+
+    killall(server) {
+        // Check if server is empty.
+        if (!server.clients.length) {
+            console.log("The server is empty.");
+        }
+        for (const socket of server.clients) {
+            const client = socket.player;
+            while (client.cells.length) server.removeNode(client.cells[0]);
+        }
+        console.log("Removed all players.");
+    }
+
     onTick(server) {
         // Called on every game tick
     }

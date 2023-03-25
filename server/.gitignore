@@ -4,6 +4,8 @@ src/ipbanlist.txt
 # Prevent tls keys from being leaked
 keys/cert.pem
 keys/key.pem
+keys/chain.pem
+keys/fullchain.pem
 
 # Botname file
 src/ai/botnames.txt

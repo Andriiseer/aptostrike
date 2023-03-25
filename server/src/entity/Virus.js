@@ -7,9 +7,9 @@ class Virus extends Cell {
         this.isVirus = true;
         this.isMotherCell = false; // Not to confuse bots
         this.color = {
-            r: 0x33,
-            g: 0xff,
-            b: 0x33
+            r: 0,
+            g: 0,
+            b: 0
         };
     }
     // Main Functions

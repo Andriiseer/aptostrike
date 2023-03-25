@@ -219,13 +219,13 @@
     }
 
     const WEBSOCKET_URL = null;
-    const SKIN_URL = '/skins/';
+    const SKIN_URL = '/assets/skins/';
     const USE_HTTPS = 'https:' === window.location.protocol;
     const EMPTY_NAME = 'An unnamed cell';
     const QUADTREE_MAX_POINTS = 32;
     const CELL_POINTS_MIN = 5;
     const CELL_POINTS_MAX = 120;
-    const VIRUS_POINTS = 100;
+    const VIRUS_POINTS = 110;
     const PI_2 = Math.PI * 2;
     const SEND_254 = new Uint8Array([254, 6, 0, 0, 0]);
     const SEND_255 = new Uint8Array([255, 1, 0, 0, 0]);
@@ -349,7 +349,6 @@
                         jagged: !!(flagMask & 0x01) || !!(flagMask & 0x10),
                         ejected: !!(flagMask & 0x20),
                     };
-
                     const color = flags.updColor ? new Color(reader.getUint8(), reader.getUint8(), reader.getUint8()) : null;
                     const skin = flags.updSkin ? reader.getStringUTF8() : null;
                     const name = flags.updName ? reader.getStringUTF8() : null;
@@ -629,10 +628,9 @@
     let mouseY = NaN;
     let macroIntervalID;
     let quadtree;
-
     const settings = {
         nick: localStorage.getItem('aptAddress'),
-        skin: '',
+        skin: localStorage.getItem("skinLink"),
         gamemode: '',
         showSkins: true,
         showNames: true,
@@ -651,11 +649,11 @@
         showMinimap: true,
         showPosition: false,
         showBorder: false,
-        showGrid: true,
+        showGrid: false,
         playSounds: false,
         soundsVolume: 0.5,
         moreZoom: false,
-        fillSkin: true,
+        fillSkin: false,
         backgroundSectors: false,
         jellyPhysics: true,
     };
@@ -671,13 +669,13 @@
         escape: false,
     };
 
-    const eatSound = new Sound('./assets/sound/eat.mp3', 0.5, 10);
-    const pelletSound = new Sound('./assets/sound/pellet.mp3', 0.5, 10);
+    const eatSound = new Sound('../assets/sound/eat.mp3', 0.5, 10);
+    const pelletSound = new Sound('../assets/sound/pellet.mp3', 0.5, 10);
 
-    fetch('skinList.txt').then(resp => resp.text()).then(data => {
+    fetch('/assets/skinList.txt').then(resp => resp.text()).then(data => {
         const skins = data.split(',').filter(name => name.length > 0);
         if (skins.length === 0) return;
-        byId('gallery-btn').style.display = 'none';
+        // byId('gallery-btn').style.display = 'none';
         const stamp = Date.now();
         for (const skin of skins) knownSkins.set(skin, stamp);
         for (const i of knownSkins.keys()) {
@@ -893,6 +891,9 @@
     }
 
     function drawLeaderboard() {
+
+        return leaderboard.visible = false; // TODO: need refactoring
+
         if (leaderboard.type === null) return leaderboard.visible = false;
         if (!settings.showNames || leaderboard.items.length === 0) {
             return leaderboard.visible = false;
@@ -976,7 +977,7 @@
         const h = border.height / sectorCount;
 
         toCamera(mainCtx);
-        mainCtx.fillStyle = settings.darkTheme ? '#666' : '#DDD';
+        // mainCtx.fillStyle = settings.darkTheme ? '#666' : '#DDD';
         mainCtx.textBaseline = 'middle';
         mainCtx.textAlign = 'center';
         mainCtx.font = `${w / 3 | 0}px Ubuntu`;
@@ -1063,7 +1064,7 @@
         // draw name above user's pos if they have a cell on the screen
         const cell = cells.byId.get(cells.mine.find(id => cells.byId.has(id)));
         if (cell) {
-            mainCtx.fillStyle = settings.darkTheme ? '#DDD' : '#222';
+            // mainCtx.fillStyle = settings.darkTheme ? '#DDD' : '#222';
             mainCtx.font = `${sectorNameSize}px Ubuntu`;
             mainCtx.fillText(cell.name || EMPTY_NAME, myPosX, myPosY - 7 - sectorNameSize / 2);
         }
@@ -1104,13 +1105,27 @@
         mainCtx.save();
         mainCtx.resetTransform();
 
-        mainCtx.fillStyle = settings.darkTheme ? '#111' : '#F2FBFF';
+        mainCtx.fillStyle = settings.darkTheme ? '#FFF' : '#000';
+        var img = document.getElementById("canvas-bg");
+        if (img) {
+            var pat = mainCtx.createPattern(img, "repeat");
+            mainCtx.rect(0, 0, 150, 100);
+            mainCtx.fillStyle = pat;
+            mainCtx.fill();
+        }
+       
+        // mainCtx.fillStyle = settings.darkTheme ? '#999' : '#F2FBFF';
         mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
         if (settings.showGrid) drawGrid();
         if (settings.backgroundSectors) drawBackgroundSectors();
 
         toCamera(mainCtx);
         drawBorders();
+        var background = new Image();
+
+        background.onload = function(){
+            mainCtx.drawImage(background,0,10000);   
+        };
 
         for (const cell of drawList) cell.draw(mainCtx);
 
@@ -1118,8 +1133,8 @@
         quadtree = null;
         mainCtx.scale(camera.viewportScale, camera.viewportScale);
 
-        let height = 2;
-        mainCtx.fillStyle = settings.darkTheme ? '#FFF' : '#000';
+        let height = 280;
+
         mainCtx.textBaseline = 'top';
         if (!isNaN(stats.score)) {
             mainCtx.font = '30px Ubuntu';
@@ -1367,14 +1382,12 @@
         }
         setSkin(value) {
             this.skin = (value && value[0] === '%' ? value.slice(1) : value) || this.skin;
-            if (this.skin === null || !knownSkins.has(this.skin) || loadedSkins.has(this.skin)) {
+            if (!this.skin) {
                 return;
             }
-            var skinLink = localStorage.getItem("skinLink");
-            console.log(skinLink);
             const skin = new Image();
-            skin.src = skinLink;
-            // `${SKIN_URL}${this.skin}.png`;
+            skin.src = this.skin;
+            
             loadedSkins.set(this.skin, skin);
         }
         setColor(value) {
@@ -1652,8 +1665,10 @@
     }
 
     window.init = () => {
+       
         mainCanvas = document.getElementById('canvas');
-        mainCtx = mainCanvas.getContext('2d');
+        mainCtx = mainCanvas.getContext('2d')
+
         chatBox = byId('chat_textbox');
         soundsVolume = byId('soundsVolume');
         mainCanvas.focus();
@@ -1747,6 +1762,7 @@
         }
         drawGame();
         Logger.info(`Init done in ${Date.now() - LOAD_START}ms`);
+        
     }
     window.setserver = (url) => {
         if (url === wsUrl && ws && ws.readyState <= WebSocket.OPEN) return;

@@ -1,8 +1,8 @@
 import React from 'react';
 
-export default function Shaders(params) {
+export function Shaders(params) {
   return (
-    <div>
+    <div id="planetShaders">
       <a style={{display: 'none'}} id="2d-vertex-shader" type='notjs'
        
           dangerouslySetInnerHTML={{

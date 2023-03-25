@@ -1,35 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InnerHtml } from './innerHtml';
-import Head from 'next/head'
-import Shaders from './Shaders'
-import { useScript } from '../../hooks/useScript';
+import { Shaders } from './Shaders'
+import { useScript } from '@hooks/useScript';
 
-export default function PlanetGenerator(props) { 
-  useScript('/jquery-3.2.0.min.js');
-  useScript('/seedrandom.js')
-  useScript('/webgl/hash.js')
-  useScript('/webgl/main.js')
-  useScript('/bundle.js')
+export function PlanetGenerator(props) { 
+  useScript('/assets/js/jquery-3.2.0.min.js');
+  useScript('/assets/js/seedrandom.js')
+  useScript('/assets/js/webgl/hash.js')
+  useScript('/assets/js/webgl/main.js')
+  useScript('/assets/js/bundle.js')
+
+  const [ shouldRenderPlanet, setShouldRenderPlanet ] = useState(false)
+
+  const updatePlanet = () => {
+    localStorage.setItem('hash', props.mint_hash)
+    window?.hashGen()
+    window?.main()
+    window?.initPlanet(props.mint_hash);
+    window?.bundle()
+  }
 
   useEffect(() => {
-    if (props.mint_hash !== '') {
-      localStorage.setItem('hash', props.mint_hash)
-      window.hashGen()
-      window.main()
-      window.initPlanet(props.mint_hash);
-      window.bundle()
+    const tryLoadPlanet = () => {
+      try {
+        updatePlanet()
+      } catch(e) {
+        setTimeout(() => {
+          tryLoadPlanet()
+        }, 500)
+      }
     }
+
+    setTimeout(() => {
+      setShouldRenderPlanet(true)
+      tryLoadPlanet()
+    }, 0)
+
   }, [props.mint_hash])
 
   return (
-    <div>
-      <Head>
-        <link href="https://fonts.googleapis.com/css?family=Dosis|Raleway" rel="stylesheet" />
-      </Head>
+    <>
       <Shaders />
-      
-      <div dangerouslySetInnerHTML={InnerHtml} ></div>
-      {!props.mint_hash && <p>Loading NFT, please wait...</p>}
-    </div>
+      {!props.mint_hash && <p style={{ position: 'absolute', top: '50%' }}>Loading NFT, please wait...</p>}
+      { shouldRenderPlanet && <div id="planetCanvas" dangerouslySetInnerHTML={InnerHtml} ></div> }
+    </>
   )
 }

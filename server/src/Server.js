@@ -4,6 +4,8 @@ const https = require("https");
 const fs = require("fs");
 let os;
 const WebSocket = require("ws");
+const _ = require('lodash')
+const crypto = require('crypto')
 
 // Project imports
 const Entity = require('./entity');
@@ -26,7 +28,7 @@ class Server {
 
         // Startup
         this.run = true;
-        this.version = '1.6.3';
+        this.version = '1.0.0 (1.6.3)';
         this.httpServer = null;
         this.lastNodeId = 1;
         this.lastPlayerId = 1;
@@ -65,6 +67,7 @@ class Server {
         // Set border, quad-tree
         this.setBorder(this.config.borderWidth, this.config.borderHeight);
         this.quadTree = new QuadNode(this.border);
+        this.prevQuadTree = null
     }
     start() {
         this.timerLoopBind = this.timerLoop.bind(this);
@@ -92,6 +95,7 @@ class Server {
             perMessageDeflate: false,
             maxPayload: 4096
         };
+  
         this.wsServer = new WebSocket.Server(wsOptions);
         this.wsServer.on('error', this.onServerSocketError.bind(this));
         this.wsServer.on('connection', this.onClientSocketOpen.bind(this));
@@ -497,15 +501,27 @@ class Server {
         }
         this.updateClients();
         // update leaderboard
-        if (((this.ticks + 7) % 25) === 0)
-            this.updateLeaderboard(); // once per second
+        // if (((this.ticks + 7) % 1) === 0)
+        this.updateLeaderboard(); // once per tick
         // ping server tracker
-        if (this.config.serverTracker && (this.ticks % 750) === 0)
+        if (this.config.serverTracker && (this.ticks % 750) === 0) {
             this.pingServerTracker(); // once per 30 seconds
+        }
+        // this.getQuadData()
+        if ((this.ticks % 100) === 0) {
+           this.getQuadData()
+        }
         // update-update time
         var tEnd = process.hrtime(tStart);
         this.updateTime = tEnd[0] * 1e3 + tEnd[1] / 1e6;
     }
+
+    getQuadData() {
+        const players = []
+        const hashSet = new Set()
+        let count = 0
+    }
+
     // update remerge first
     movePlayer(cell, client) {
         if (client.socket.isConnected == false || client.frozen || !client.mouse)
@@ -686,7 +702,6 @@ class Server {
             var maxGrow = this.config.foodMaxSize - cell.radius;
             cell.setSize(cell.radius += maxGrow * Math.random());
         }
-        cell.color = this.getRandomColor();
         this.addNode(cell);
     }
     // Вирусы
@@ -694,7 +709,7 @@ class Server {
     spawnVirus() {
         var virus = new Entity.Virus(this, null, this.randomPos(), this.config.virusMinSize);
         this.safeSpawn(virus);
-
+        
     }
     spawnCells(virusCount, foodCount) {
         for (var i = 0; i < foodCount; i++) {

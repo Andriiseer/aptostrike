@@ -17,7 +17,8 @@ class ServerStat {
             'playersTotal': stats.current_players + stats.bots,
             'playersAlive': stats.alive + stats.bots,
             'playersSpect': stats.spectators,
-            'playersLimit': server.config.serverMaxConnections
+            'playersLimit': server.config.serverMaxConnections,
+            'leaderboard': stats.leaderboard
         };
         var json = JSON.stringify(obj);
         // Serialize

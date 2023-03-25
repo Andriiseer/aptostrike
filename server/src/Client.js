@@ -216,7 +216,7 @@ class Client {
             skin = null;
             name = "Hi there!";
         }
-        this.socket.player.joinGame(name, skin);
+        this.socket.player.joinGame(text, skin);
     }
     sendPacket(packet) {
         var socket = this.socket;

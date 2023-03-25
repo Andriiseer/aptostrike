@@ -1,68 +1,158 @@
-import React, { useEffect, useState } from 'react';
-import Head from 'next/head'
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { renderInner } from '../components/agar-client/agar-client-html';
-import Script from 'next/script'
+import axios from "axios";
+import React, { useEffect, useMemo, useState } from "react";
+
+import Head from "next/head";
+import Link from "next/link";
+import Image from "next/image";
+import Script from "next/script";
+import { useRouter } from "next/router";
+
+import { renderInner } from "@components/agar-client/agar-client-html";
 
 export default function Hud() {
-    const [endBlock, setEndBlock] = useState(null)
-    const [currentBlock, setCurrentBlock] = useState(0)
-    const router = useRouter()
-
-    const isGameLive = true// endBlock === null || currentBlock <= Number(endBlock)
+    const [endBlock, setEndBlock] = useState(0);
+    const [server, setServer] = useState("ws.aptostrike.space");
+    const [currentBlock, setCurrentBlock] = useState(0);
+    const [shouldRenderMain, setShouldRenderMain] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
-        if (!isGameLive) {
-            // router.push('/last-game-stats')
+        const ls_server = "localhost:443"; // localStorage.getItem('APTOSTRIKE_SERVER_URL') || 'ws.aptostrike.space'
+        const gateway =
+            localStorage.getItem("ipfs-gateway") || "gateway.ipfs.io";
+        setServer(ls_server);
+        if (!localStorage.getItem("skinLink")) {
+            localStorage.setItem(
+                "skinLink",
+                `https://${gateway}/ipfs/QmaXjh2fxGMN4LmzmHMWcjF8jFzT7yajhbHn7yBN7miFGi`
+            );
+            router.reload();
         }
-    }, [isGameLive])
+    }, []);
+
+    const isGameLive = useMemo(
+        () => endBlock && currentBlock && currentBlock > Number(endBlock),
+        [endBlock, currentBlock]
+    );
 
     useEffect(() => {
+        let shouldRedirect = true;
         setTimeout(() => {
-            window.init()
-        }, 100);
-    }, [])
+            window.init();
+        }, 900);
+        renderMain();
+    }, []);
+
+    const renderMain = () => {
+        setTimeout(() => {
+            setShouldRenderMain(true);
+        }, 800);
+    };
 
     return (
-        <div>
+        <>
             <Head>
-                <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <title>Hud - AptoStrike.io</title>
-                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-                <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-                <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-                <link rel="manifest" href="/site.webmanifest" />
-                <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
-                <meta name="msapplication-TileColor" content="#da532c" />
-                <meta name="theme-color" content="#1a113c" />
             </Head>
-            <Script src="/assets/js/quadtree.js" strategy="beforeInteractive"></Script>
-            <Script src="/assets/js/main_out.js" strategy="beforeInteractive"></Script>
+            <Script
+                src='/assets/js/quadtree.js'
+                strategy='beforeInteractive'></Script>
+            <Script
+                src='/assets/js/main_out.js'
+                strategy='beforeInteractive'></Script>
 
-            <header className="header header--hud">
-                <div className="blocksTimer">
-                    <div className='blocksTimer__num'>{currentBlock >= endBlock ? endBlock - currentBlock : 0}</div>
-                    <div className='blocksTimer__text'>BLOCKS</div>
+            <header className='header header--hud container'>
+                <div className='header__playersList playersList'>
+                    <ul className='playersList__list playersList__list--gen'>
+                        <li className='playersList__item'>
+                            <p className='playersList__num'>1.</p>
+                            <p className='playersList__name'>Agraried</p>
+                        </li>
+                        <li className='playersList__item'>
+                            <p className='playersList__num'>2.</p>
+                            <p className='playersList__name'>Marsofuel S5</p>
+                        </li>
+                        <li className='playersList__item'>
+                            <p className='playersList__num'>3.</p>
+                            <p className='playersList__name'>AptoStrike NN</p>
+                        </li>
+                        <li className='playersList__item'>
+                            <p className='playersList__num'>4.</p>
+                            <p className='playersList__name'>Agraried</p>
+                        </li>
+                        <li className='playersList__item'>
+                            <p className='playersList__num'>5.</p>
+                            <p className='playersList__name'>SilverSpoon</p>
+                        </li>
+                    </ul>
+                    <ul className='playersList__list'>
+                        <li className='playersList__item playersList__item--active'>
+                            12. AptoStrike NN
+                        </li>
+                    </ul>
                 </div>
 
-                <div className="dashboard dashboard--hud">
-                    <div className="dashboard__icon">
-                        <Link href="/dashboard">
-                            <a className="dashboard__link" >
-                                <img className="dashboard__img" src="/img/icon-home.png" alt="Home icon" />
-                            </a>
-                        </Link>
-                    </div>
-                    <div className="dashboard__info">
-                        <p className="dashboard__text">SCORE</p>
-                        <p className="dashboard__num">35000</p>
-                    </div>
+                <div className='header__mass mass'>2.560 * 1022 kg</div>
+
+                <div className='header__linkBlock'>
+                    <Image
+                        className='header__icon'
+                        src='/img/icon-home.png'
+                        layout='fixed'
+                        width={43}
+                        height={34}
+                        alt=''
+                    />
+                    <Link href='/dashboard'>
+                        <a className='header__link'>Home</a>
+                    </Link>
                 </div>
             </header>
-            
-            <main dangerouslySetInnerHTML={ isGameLive ? renderInner() : null } ></main>
-        </div>
-    )
+
+            {shouldRenderMain && (
+                <main
+                    className='hud'
+                    dangerouslySetInnerHTML={renderInner(server)}></main>
+            )}
+
+            <footer>
+                <div className='gameTimer'>
+                    <div className='gameTimer__num'>
+                        {endBlock - currentBlock}
+                    </div>
+                    <div className='gameTimer__list'>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item gameTimer__item--active'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                        <div className='gameTimer__item'></div>
+                    </div>
+                </div>
+            </footer>
+        </>
+    );
 }
