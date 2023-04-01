@@ -8,6 +8,7 @@ import Script from "next/script";
 import { useRouter } from "next/router";
 
 import { renderInner } from "@components/agar-client/agar-client-html";
+import InGameLeaderboard from "@components/InGameLeaderboard/InGameLeaderboard";
 
 export default function Hud() {
     const [endBlock, setEndBlock] = useState(0);
@@ -62,38 +63,15 @@ export default function Hud() {
                 strategy='beforeInteractive'></Script>
 
             <header className='header header--hud container'>
-                <div className='header__playersList playersList'>
-                    <ul className='playersList__list playersList__list--gen'>
-                        <li className='playersList__item'>
-                            <p className='playersList__num'>1.</p>
-                            <p className='playersList__name'>Agraried</p>
-                        </li>
-                        <li className='playersList__item'>
-                            <p className='playersList__num'>2.</p>
-                            <p className='playersList__name'>Marsofuel S5</p>
-                        </li>
-                        <li className='playersList__item'>
-                            <p className='playersList__num'>3.</p>
-                            <p className='playersList__name'>AptoStrike NN</p>
-                        </li>
-                        <li className='playersList__item'>
-                            <p className='playersList__num'>4.</p>
-                            <p className='playersList__name'>Agraried</p>
-                        </li>
-                        <li className='playersList__item'>
-                            <p className='playersList__num'>5.</p>
-                            <p className='playersList__name'>SilverSpoon</p>
-                        </li>
-                    </ul>
-                    <ul className='playersList__list'>
-                        <li className='playersList__item playersList__item--active'>
-                            12. AptoStrike NN
-                        </li>
-                    </ul>
+                <div className='ingame-leaderboard-wrapper'>
+                    <InGameLeaderboard />
                 </div>
 
+                <div>
                 <div className='header__mass mass'>2.560 * 1022 kg</div>
+                </div>
 
+                <div className='linkBlock-wrapper'>
                 <div className='header__linkBlock'>
                     <Image
                         className='header__icon'
@@ -106,6 +84,7 @@ export default function Hud() {
                     <Link href='/dashboard'>
                         <a className='header__link'>Home</a>
                     </Link>
+                    </div>
                 </div>
             </header>
 

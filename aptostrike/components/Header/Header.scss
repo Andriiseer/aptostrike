@@ -5,20 +5,36 @@
 	padding-top: 20px;
 	padding-bottom: 20px;
 
+	&__mass, &__linkBlock {
+		display: flex;
+		align-items: center;
+	}
+
 	&--hud {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: auto;
+		> :first-child, > :last-child {
+			flex-grow: 1;
+			flex-basis: 0;
+		}
+		align-items: flex-start;
+		pointer-events: none;
+		position: fixed;
+		inset: 0 0 auto;
 		z-index: 9;
 
-		align-items: flex-start;
+		.ingame-leaderboard-wrapper {
+			display: flex;
+			justify-content: flex-start;
+		};
+	
+		.linkBlock-wrapper {
+			display: flex;
+			justify-content: flex-end;
+		};
 	}
 
 	&__linkBlock {
 		display: flex;
-		//justify-content: flex-end;
+		pointer-events: all;
 		min-width: 200px;
 	}
 

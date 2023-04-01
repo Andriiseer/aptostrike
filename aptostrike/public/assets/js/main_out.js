@@ -433,6 +433,12 @@
                         name: Cell.parseName(lbName).name || EMPTY_NAME
                     });
                 }
+                const inGameleaderboardUpdateEvent = new CustomEvent('inGameLeaderboardUpdate', {
+                    detail: {
+                      leaderboard
+                    },
+                  });
+                window.dispatchEvent(inGameleaderboardUpdateEvent);
                 drawLeaderboard();
                 break;
             }
