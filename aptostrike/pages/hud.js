@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 
 import { renderInner } from "@components/agar-client/agar-client-html";
 import InGameLeaderboard from "@components/InGameLeaderboard/InGameLeaderboard";
+import useVirusAnimation from "@hooks/useVirusAnimation";
 
 export default function Hud() {
     const [endBlock, setEndBlock] = useState(0);
@@ -16,6 +17,8 @@ export default function Hud() {
     const [currentBlock, setCurrentBlock] = useState(0);
     const [shouldRenderMain, setShouldRenderMain] = useState(false);
     const router = useRouter();
+
+    useVirusAnimation();
 
     useEffect(() => {
         const ls_server = "localhost:443"; // localStorage.getItem('APTOSTRIKE_SERVER_URL') || 'ws.aptostrike.space'
@@ -60,7 +63,7 @@ export default function Hud() {
                 strategy='beforeInteractive'></Script>
             <Script
                 src='/assets/js/main_out.js'
-                strategy='beforeInteractive'></Script>
+                strategy='afterInteractive'></Script>
 
             <header className='header header--hud container'>
                 <div className='ingame-leaderboard-wrapper'>

@@ -1,3 +1,7 @@
+// Constants
+const FOOD_SKIN_SRC = "img/game-food.png";
+const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
+
 (function () {
     'use strict';
 
@@ -348,6 +352,7 @@
                         updName: !!(flagMask & 0x08),
                         jagged: !!(flagMask & 0x01) || !!(flagMask & 0x10),
                         ejected: !!(flagMask & 0x20),
+                        food: !!(flagMask & 0x80),
                     };
                     const color = flags.updColor ? new Color(reader.getUint8(), reader.getUint8(), reader.getUint8()) : null;
                     const skin = flags.updSkin ? reader.getStringUTF8() : null;
@@ -600,6 +605,9 @@
 
     const knownSkins = new Map();
     const loadedSkins = new Map();
+
+    const animatedVirus = new VirusAnimation();
+    
     const macroCooldown = 1000 / 7;
     const camera = {
         x: 0,
@@ -1273,6 +1281,7 @@
             this.setSkin(skin);
             this.jagged = flags.jagged;
             this.ejected = flags.ejected;
+            this.food = flags.food;
             this.born = syncUpdStamp;
             this.points = [];
             this.pointsVel = [];
@@ -1446,6 +1455,27 @@
                 ctx.globalAlpha = Math.max(120 - Date.now() + this.dead, 0) / 120;
             } else {
                 ctx.globalAlpha = Math.min(Date.now() - this.born, 120) / 120;
+            }
+
+            // Skins for food  & viruses
+            if (this.jagged) {
+                const skinFrameCanvas = animatedVirus.currentFrame;
+                ctx.save(); // for the clip
+                ctx.clip();
+                ctx.drawImage(skinFrameCanvas, this.x - this.s, this.y - this.s,
+                    this.s * 2, this.s * 2);
+                ctx.restore();
+                return;
+            }
+
+            if (this.food) {
+                const skinImage = loadedSkins.get(FOOD_SKIN_SRC);
+                ctx.save(); // for the clip
+                ctx.clip();
+                ctx.drawImage(skinImage, this.x - this.s * 2, this.y - this.s * 2,
+                    this.s * 4, this.s * 4);
+                ctx.restore();
+                return;
             }
 
             const skinImage = loadedSkins.get(this.skin);
@@ -1670,7 +1700,17 @@
         camera.userZoom = Math.min(camera.userZoom, 4);
     }
 
-    window.init = () => {
+    const loadSkin = async (skinLink) => {
+        const skinImageElement = new Promise((resolve) => {
+            const imageElement = new Image();
+            imageElement.src = skinLink;
+            imageElement.onload = () => resolve(imageElement);
+        });
+
+        loadedSkins.set(skinLink, await skinImageElement);
+    };
+
+    window.init = async () => {
        
         mainCanvas = document.getElementById('canvas');
         mainCtx = mainCanvas.getContext('2d')
@@ -1754,6 +1794,10 @@
                 touchCircle.hide();
             }
         });
+
+        // Loading initial skins
+        await loadSkin(FOOD_SKIN_SRC);
+        await animatedVirus.loadGif(VIRUS_SKIN_SRC);
 
         gameReset();
         showESCOverlay();
