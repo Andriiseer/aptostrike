@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { renderInner } from "@components/agar-client/agar-client-html";
 import InGameLeaderboard from "@components/InGameLeaderboard/InGameLeaderboard";
 import useVirusAnimation from "@hooks/useVirusAnimation";
+import GameProgressTimer from "@components/GameProgressTimer/GameProgressTimer";
 
 export default function Hud() {
     const [endBlock, setEndBlock] = useState(0);
@@ -98,42 +99,9 @@ export default function Hud() {
             )}
 
             <footer>
-                <div className='gameTimer'>
-                    <div className='gameTimer__num'>
-                        {endBlock - currentBlock}
-                    </div>
-                    <div className='gameTimer__list'>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item gameTimer__item--active'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                        <div className='gameTimer__item'></div>
-                    </div>
-                </div>
+                <GameProgressTimer
+                    blocksRemaining={endBlock - currentBlock >= 0 ? endBlock - currentBlock : null}
+                 />
             </footer>
         </>
     );
