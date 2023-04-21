@@ -10,7 +10,7 @@ export default function Landing() {
     return (
         <>
             <Head>
-                <title>AptoStrike.io</title>
+                <title>AptoStrike.space</title>
             </Head>
             
             <main className='lp container container--small'>

@@ -57,7 +57,7 @@ export default function Hud() {
     return (
         <>
             <Head>
-                <title>Hud - AptoStrike.io</title>
+                <title>Hud - AptoStrike.space</title>
             </Head>
             <Script
                 src='/assets/js/quadtree.js'

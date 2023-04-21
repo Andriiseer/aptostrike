@@ -14,7 +14,7 @@ export default function LastGameStats() {
     return (
         <div className="background">
             <Head>
-                <title>Game Winners - AptoStrike.io</title>
+                <title>Game Winners - AptoStrike.space</title>
             </Head>
             <Header />
             <main className='container container--small'>

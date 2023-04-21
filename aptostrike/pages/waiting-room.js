@@ -18,7 +18,7 @@ export default function WaitingRoom() {
     return (
         <div className='background'>
             <Head>
-                <title>Waiting room - AptoStrike.io</title>
+                <title>Waiting room - AptoStrike.space</title>
             </Head>
 
             <Header />

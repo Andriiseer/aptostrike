@@ -1,20 +1,31 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import Head from "next/head";
+import { useRouter } from "next/router";
+import usePlanet from "@hooks/usePlanet";
 
 import { Header } from "@components/Header/Header";
 import { Planet } from "@components/Planet/Planet";
 import { PlanetList } from "@components/PlanetList/PlanetList";
 import { PlanetDataList } from "@components/PlanetDataList/PlanetDataList";
 import { PayMethod } from "@components/PayMethod/PayMethod";
+import { PlanetScripts } from "@components/PlanetScripts/PlanetScripts";
+
+const DEFAULT_GATEWAY = 'gateway.ipfs.io';
 
 export default function Dashboard() {
+    const router = useRouter();
     const [mintHash, setMintHash] = useState("");
     const [planetsAvailable, setPlanetsAvailable] = useState([]);
     const [planetSelected, setPlanetSelected] = useState(0);
     const [selectedServerIndex, setSelectedServerIndex] = useState(undefined);
     const [serverList, setServerList] = useState([]);
+
+    const {
+        isPlanetInitialized,
+        setArePlanetScriptsReady
+    } = usePlanet(mintHash);
 
     const promisify = (gateway) => {
         return new Promise((resolve, reject) => {
@@ -65,27 +76,40 @@ export default function Dashboard() {
 
     useEffect(async () => {
         ipfsRace();
-
         let ls_server = localStorage.getItem("APTOSTRIKE_SERVER_URL");
             setSelectedServerIndex(0);
     }, []);
 
-    setTimeout(async () => {
-        let gateway;
-        if (typeof window !== "undefined")
-            gateway = localStorage.getItem("ipfs-gateway") || "gateway.ipfs.io";
-        else {
-            gateway = "gateway.ipfs.io";
-        }
-        const planets = [{
-            gen_hash:
-                "ooKg2zuJu9XhZBRKQaBrEDvpeYZjDPmKREp3PMSZHLkoSFK3ejN",
-            img_link: `https://${gateway}/ipfs/QmaXjh2fxGMN4LmzmHMWcjF8jFzT7yajhbHn7yBN7miFGi`,
-            token_id: "DEMO PLANET",
-        }];
+    const getGateway = useCallback(() => {
+        if (typeof window === "undefined") {
+            return DEFAULT_GATEWAY;
+        };
 
-        setPlanetsAvailable(planets);
-    }, 2000);
+        const localStorageGateway = localStorage.getItem("ipfs-gateway");
+
+        if (!localStorageGateway) {
+            return DEFAULT_GATEWAY;
+        };
+
+        return localStorageGateway;
+    }, []);
+
+    const getDemoPlanet = useCallback((gateway) => {
+        return {
+            gen_hash: "ooKg2zuJu9XhZBRKQaBrEDvpeYZjDPmKREp3PMSZHLkoSFK3ejN",
+            img_link: `https://${gateway}/ipfs/QmaXjh2fxGMN4LmzmHMWcjF8jFzT7yajhbHn7yBN7miFGi`,
+            token_id: "DEMO PLANET"
+        };
+    }, []);
+
+    useEffect(() => {
+        const fetchPlanets = () => {
+            const gateway = getGateway();
+            setPlanetsAvailable([ getDemoPlanet(gateway) ]);
+        };
+
+        fetchPlanets();
+    }, []);
 
     useEffect(() => {
         if (typeof selectedServerIndex == "undefined" || !serverList.length)
@@ -101,7 +125,8 @@ export default function Dashboard() {
     }, [selectedServerIndex]);
 
     useEffect(() => {
-        if (planetsAvailable?.[planetSelected]) {
+        if (planetsAvailable.length === 0) return;
+
             const selected = planetsAvailable[planetSelected];
             if (selected.token_id === "DEMO PLANET") {
                 setIsDemoMode(true);
@@ -111,14 +136,14 @@ export default function Dashboard() {
             setMintHash(selected.gen_hash);
             localStorage.setItem("mintHash", selected.gen_hash);
             localStorage.setItem("skinLink", selected.img_link);
-        }
     }, [planetSelected, planetsAvailable]);
 
     return (
         <>
             <Head>
-                <title>Dashboard - AptoStrike.io</title>
+                <title>Dashboard - AptoStrike</title>
             </Head>
+            <PlanetScripts onScriptsReady={() => setArePlanetScriptsReady(true)} />
 
             <Header />
 
@@ -133,12 +158,15 @@ export default function Dashboard() {
 
                 <div className='dashboard__center'>
                     <img src='/img/bg-planet.png' className='planet_outline' />
-                    <Planet mintHash={mintHash} />
+                    <Planet isPlanetReady={isPlanetInitialized} />
                     <PayMethod />
                 </div>
 
                 <div className='dashboard__right'>
-                    <PlanetDataList mintHash={mintHash} />
+                    <PlanetDataList
+                        isPlanetReady={isPlanetInitialized}
+                        mintHash={mintHash}
+                    />
                 </div>
 
                 <a className='btn btn--center btn--wide'>

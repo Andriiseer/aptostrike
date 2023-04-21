@@ -8,12 +8,14 @@ const DEFAULT_PLANET_FEATURES = {
     exoplanet: false
 }
 
-export function PlanetDataList({ className='', mintHash }) {
+export function PlanetDataList({ className='', isPlanetReady, mintHash }) {
     const [planetFeatures, setPlanetFeatures] = useState(DEFAULT_PLANET_FEATURES);
     
     useEffect(() => {
-        window.$hashFeatures && setPlanetFeatures(window.$hashFeatures)
-    }, [mintHash])
+        if (!isPlanetReady) return;
+
+        setPlanetFeatures(window.$hashFeatures)
+    }, [isPlanetReady, mintHash]);
 
     return (
         <div className={`planetData ${className}`}>
