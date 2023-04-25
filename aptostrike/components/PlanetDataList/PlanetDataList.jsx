@@ -28,7 +28,7 @@ export function PlanetDataList({ className='', isPlanetReady, mintHash }) {
                 }
                 <li className="planetData__text">
                     Sell or Buy planets <br />
-                    on <a className="planetData__link" href="https://www.hash.xyz/marketplace/generative/3808">Marketplace</a>
+                    on Marketplace
                 </li>
             </ul>
 

@@ -1,14 +1,24 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { PlanetGenerator } from "@components/PlanetGenerator/PlanetGenerator";
+import { Planet } from "@components/Planet/Planet";
 import { Header } from "@components/Header/Header";
+import usePlanet from "@hooks/usePlanet";
+import { PlanetScripts } from "@components/PlanetScripts/PlanetScripts";
+import { useServerContext } from '@context/ServerContext';
 
 export default function WaitingRoom() {
     const [waitRoom, setWaitRoom] = useState([]);
     const [roomSize, setRoomSize] = useState(-1);
     const [mintHash, setMintHash] = useState("");
     const router = useRouter();
+
+    const {
+        isPlanetInitialized,
+        setArePlanetScriptsReady
+    } = usePlanet(mintHash);
+
+    const { serverName } = useServerContext();
 
     const refund = async () => {
         // Refund contract logic
@@ -20,6 +30,7 @@ export default function WaitingRoom() {
             <Head>
                 <title>Waiting room - AptoStrike.space</title>
             </Head>
+            <PlanetScripts onScriptsReady={() => setArePlanetScriptsReady(true)} />
 
             <Header />
 
@@ -32,22 +43,26 @@ export default function WaitingRoom() {
                                 : "Loading players list..."}
                         </h2>
                         <ul className='listBlock__list'>
-                            {waitRoom.map((el) =>
-                                el === 'address' ? (
+                            {waitRoom.map((player) =>
+                                player.name === 'address' ? (
                                     <li
+                                        key={player.name}
                                         style={{
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
                                             wordWrap: "nowrap",
                                         }}
-                                        className='listBlock__item listBlock__item--active'>
-                                        {el}
+                                        className='listBlock__item listBlock__item--active'
+                                    >
+                                        {player.name}
                                     </li>
                                 ) : (
                                     <li
+                                        key={player.name}
                                         style={{ overflow: "hidden" }}
-                                        className='listBlock__item'>
-                                        {el}
+                                        className='listBlock__item'
+                                    >
+                                        {player.name}
                                     </li>
                                 )
                             )}
@@ -56,13 +71,8 @@ export default function WaitingRoom() {
                 </div>
 
                 <div className='page__center'>
-                    <div
-                        style={{
-                            position: "relative",
-                            width: "23%",
-                            margin: "0 auto",
-                        }}>
-                        <PlanetGenerator mint_hash={mintHash} />
+                    <div className='planet__wrapper--flex-gap'>
+                        <Planet isPlanetReady={isPlanetInitialized} />
 
                         <a className='btn btn--center' onClick={() => refund()}>
                             Leave room

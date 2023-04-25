@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { useServerContext } from '@context/ServerContext';
 
 const PROGRESS_TIMER_LENGTH = 30;
 
 const useGameProgressTimer = (blocksRemaining) => {
-    const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [gameDuration, setGameDuration] = useState(null); // in blocks
     const [blockDuration, setBlockDuration] = useState(null); // in seconds
     const [
@@ -12,9 +12,21 @@ const useGameProgressTimer = (blocksRemaining) => {
         setOptimisticGameRemainingPercentage
     ] = useState(null);
 
+    const { serverName } = useServerContext();
+
+    // Checking if initial data is loaded and valid
+    const isDataLoadedAndValid = useMemo(
+        () =>
+            gameDuration &&
+            blockDuration &&
+            blocksRemaining !== null &&
+            gameDuration >= blocksRemaining,
+        [gameDuration, blockDuration, blocksRemaining]
+    );
+
     // Setting optimistic game remaining percentage
     useEffect(() => {
-        if (!isDataLoaded) return;
+        if (!isDataLoadedAndValid) return;
 
         let interval;
 
@@ -30,6 +42,7 @@ const useGameProgressTimer = (blocksRemaining) => {
         // Real game remaining percentage value, based on block updates data
         const realGameRemainingPercentage =
             (blocksRemaining / gameDuration) * 100;
+
         const percentagePerUpdate = 100 / PROGRESS_TIMER_LENGTH;
         const percentagePerBlock = Number.parseFloat(
             (100 / (PROGRESS_TIMER_LENGTH / gameDuration)).toFixed(2)
@@ -38,8 +51,6 @@ const useGameProgressTimer = (blocksRemaining) => {
         const gameDurationInSeconds = blockDuration * gameDuration;
         const intervalDelay =
             (gameDurationInSeconds / PROGRESS_TIMER_LENGTH) * 1000;
-
-        const isInitialBlock = blocksRemaining === gameDuration;
 
         const handleOptimisticUpdates = () => {
             setOptimisticGameRemainingPercentage((prevOptimisticPercentage) => {
@@ -57,30 +68,18 @@ const useGameProgressTimer = (blocksRemaining) => {
             });
         };
 
-        // Setting initial percentage value and initial interval when the game starts
-        if (isInitialBlock) {
-            setOptimisticGameRemainingPercentage(realGameRemainingPercentage);
-            interval = setInterval(handleOptimisticUpdates, intervalDelay);
-        }
-
-        // Running on block updates
-        if (!isInitialBlock) {
-            setOptimisticGameRemainingPercentage(realGameRemainingPercentage);
-            clearInterval(interval);
-            interval = setInterval(handleOptimisticUpdates, intervalDelay);
-        }
+        // Setting on initial block and on block updates
+        setOptimisticGameRemainingPercentage(realGameRemainingPercentage);
+        interval = setInterval(handleOptimisticUpdates, intervalDelay);
 
         return () => clearInterval(interval);
-    }, [isDataLoaded, blocksRemaining]);
+    }, [isDataLoadedAndValid, blocksRemaining]);
 
     // Fetching game duration for current room (in blocks)
     useEffect(() => {
-        const serverName = localStorage.getItem("APTOSTRIKE_SERVER_NAME");
-        const sanitizedServerName = serverName.replaceAll('"', "");
-
         const controller = new AbortController();
 
-        const fetchGameDuration = () => {
+        const fetchGameDuration = async () => {
             // Fetching game duration for current room (in blocks)
         };
 
@@ -93,7 +92,7 @@ const useGameProgressTimer = (blocksRemaining) => {
     useEffect(() => {
         const controller = new AbortController();
 
-        const fetchBlockDuration = () => {
+        const fetchBlockDuration = async () => {
             // Fetching average block duration (in seconds) in current cycle
         };
 
@@ -102,20 +101,16 @@ const useGameProgressTimer = (blocksRemaining) => {
         return () => controller.abort();
     }, []);
 
-    // Handling the setting of isDataLoaded state variable
-    useEffect(() => {
-        if (!gameDuration || !blockDuration || blocksRemaining == null || blocksRemaining > gameDuration) {
-            setIsDataLoaded(false);
-            return;
-        };
-
-        setIsDataLoaded(true);
-    }, [gameDuration, blockDuration, blocksRemaining]);
+    const isReady = useMemo(
+        () =>
+            optimisticGameRemainingPercentage !== null && isDataLoadedAndValid,
+        [optimisticGameRemainingPercentage, isDataLoadedAndValid]
+    );
 
     // If optimistically calculated game remaining percentage is not yet known
     // This is the main value on the basis of which the displayed ...
     // .. GameProgressTimer is calculated
-    if (optimisticGameRemainingPercentage == null || !isDataLoaded) {
+    if (!isReady) {
         return {
             isLoading: true,
             activeTimerPiecesCount: null,

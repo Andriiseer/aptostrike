@@ -11,22 +11,38 @@ import { PlanetList } from "@components/PlanetList/PlanetList";
 import { PlanetDataList } from "@components/PlanetDataList/PlanetDataList";
 import { PayMethod } from "@components/PayMethod/PayMethod";
 import { PlanetScripts } from "@components/PlanetScripts/PlanetScripts";
+import useContractServers from "@hooks/useContractServers";
 
-const DEFAULT_GATEWAY = 'gateway.ipfs.io';
+const DEFAULT_GATEWAY = "gateway.ipfs.io";
+
+const IPFS_GATEWAYS = [
+    "gateway.ipfs.io",
+    "ipfs.io",
+    "infura-ipfs.io",
+    "cloudflare-ipfs.com",
+    "dweb.link",
+    "ipfs.fleek.co",
+    "ipfs.lain.la",
+    "nftstorage.link",
+    "ipfs.infura.io",
+    "ipfs.telos.miami",
+    "ipfs.eth.aragon.network",
+    "via0.com",
+    "gateway.pinata.cloud"
+];
 
 export default function Dashboard() {
     const router = useRouter();
     const [mintHash, setMintHash] = useState("");
     const [planetsAvailable, setPlanetsAvailable] = useState([]);
     const [planetSelected, setPlanetSelected] = useState(0);
-    const [selectedServerIndex, setSelectedServerIndex] = useState(undefined);
-    const [serverList, setServerList] = useState([]);
 
-    const {
-        isPlanetInitialized,
-        setArePlanetScriptsReady
-    } = usePlanet(mintHash);
+    const { contractServers, selectedServerIndex } = useContractServers();
 
+    const { isPlanetInitialized, setArePlanetScriptsReady } =
+        usePlanet(mintHash);
+
+    useEffect(() => {
     const promisify = (gateway) => {
         return new Promise((resolve, reject) => {
             try {
@@ -48,25 +64,9 @@ export default function Dashboard() {
     };
 
     const ipfsRace = async () => {
-        const ipfsGateways = [
-            "gateway.ipfs.io",
-            "ipfs.io",
-            "infura-ipfs.io",
-            "cloudflare-ipfs.com",
-            "dweb.link",
-            "ipfs.fleek.co",
-            "ipfs.lain.la",
-            "nftstorage.link",
-            "ipfs.infura.io",
-            "ipfs.telos.miami",
-            "ipfs.eth.aragon.network",
-            "via0.com",
-            "gateway.pinata.cloud",
-        ];
-
         const promiseList = [];
 
-        for (let gateway of ipfsGateways) {
+            for (let gateway of IPFS_GATEWAYS) {
             promiseList.push(promisify(gateway));
         }
 
@@ -74,16 +74,13 @@ export default function Dashboard() {
         localStorage.setItem("ipfs-gateway", winner);
     };
 
-    useEffect(async () => {
         ipfsRace();
-        let ls_server = localStorage.getItem("APTOSTRIKE_SERVER_URL");
-            setSelectedServerIndex(0);
     }, []);
 
     const getGateway = useCallback(() => {
         if (typeof window === "undefined") {
             return DEFAULT_GATEWAY;
-        };
+        }
 
         const localStorageGateway = localStorage.getItem("ipfs-gateway");
 
@@ -128,11 +125,6 @@ export default function Dashboard() {
         if (planetsAvailable.length === 0) return;
 
             const selected = planetsAvailable[planetSelected];
-            if (selected.token_id === "DEMO PLANET") {
-                setIsDemoMode(true);
-            } else {
-                setIsDemoMode(false);
-            }
             setMintHash(selected.gen_hash);
             localStorage.setItem("mintHash", selected.gen_hash);
             localStorage.setItem("skinLink", selected.img_link);
@@ -141,14 +133,16 @@ export default function Dashboard() {
     return (
         <>
             <Head>
-                <title>Dashboard - AptoStrike</title>
+                <title>Dashboard - AptoStrike.space</title>
             </Head>
-            <PlanetScripts onScriptsReady={() => setArePlanetScriptsReady(true)} />
+            <PlanetScripts
+                onScriptsReady={() => setArePlanetScriptsReady(true)}
+            />
 
             <Header />
 
-            <main className='dashboard container'>
-                <div className='dashboard__left'>
+            <main className="dashboard container">
+                <div className="dashboard__left">
                     <PlanetList
                         planetsAvailable={planetsAvailable}
                         setPlanetSelected={setPlanetSelected}
@@ -156,13 +150,13 @@ export default function Dashboard() {
                     />
                 </div>
 
-                <div className='dashboard__center'>
-                    <img src='/img/bg-planet.png' className='planet_outline' />
+                <div className="dashboard__center">
+                    <img src="/img/bg-planet.png" className="planet_outline" />
                     <Planet isPlanetReady={isPlanetInitialized} />
                     <PayMethod />
                 </div>
 
-                <div className='dashboard__right'>
+                <div className="dashboard__right">
                     <PlanetDataList
                         isPlanetReady={isPlanetInitialized}
                         mintHash={mintHash}

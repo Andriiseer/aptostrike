@@ -15,8 +15,8 @@ export function PlanetList({ setPlanetSelected, planetsAvailable, planetSelected
             }
             {!planetsAvailable.length && 
                 <li className="planetsList__text">
-                    <a className="planetsList__link" href="https://www.hash.xyz/marketplace/generative/3808">Mint new planet</a> or  buy it <br />
-                    on <a className="planetsList__link" href="https://www.hash.xyz/marketplace/generative/3808">Marketplace</a>
+                    Mint new planet or  buy it <br />
+                    onMarketplace
                 </li>
             }
             </ol>
