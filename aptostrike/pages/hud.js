@@ -11,8 +11,9 @@ import { renderInner } from "@components/agar-client/agar-client-html";
 import InGameLeaderboard from "@components/InGameLeaderboard/InGameLeaderboard";
 import GameProgressTimer from "@components/GameProgressTimer/GameProgressTimer";
 import useVirusAnimation from "@hooks/useVirusAnimation";
+import usePlanetRender from "@hooks/usePlanetRender";
 
-import { useServerContext } from "@context/ServerContext";
+import { useSelectedServerContext } from "@context/SelectedServerContext";
 import RouteGuard from "@components/RouteGuard/RouteGuard";
 
 function Hud() {
@@ -21,27 +22,15 @@ function Hud() {
     const [shouldRenderMain, setShouldRenderMain] = useState(false);
     const router = useRouter();
 
-    const { serverName, serverUrl, statsUrl } = useServerContext();
-
-    useEffect(() => {
-        const gateway =
-            localStorage.getItem("ipfs-gateway") || "gateway.ipfs.io";
-        if (!localStorage.getItem("skinLink")) {
-            localStorage.setItem(
-                "skinLink",
-                `https://${gateway}/ipfs/QmaXjh2fxGMN4LmzmHMWcjF8jFzT7yajhbHn7yBN7miFGi`
-            );
-            router.reload();
-        }
-    }, []);
+    const { serverName, serverUrl, statsUrl } = useSelectedServerContext();
 
     const isGameFinished = useMemo(
-        () => !!(currentBlock && endBlock && currentBlock >= endBlock),
+        () => !!(currentBlock > 0 && endBlock > 0 && currentBlock >= endBlock),
         [currentBlock, endBlock]
     );
 
     const isGameLive = useMemo(
-        () => !!(currentBlock && endBlock && endBlock - currentBlock >= 0),
+        () => !!(currentBlock > 0 && endBlock > 0 && endBlock - currentBlock >= 0),
         [endBlock, currentBlock]
     );
 
@@ -57,7 +46,7 @@ function Hud() {
             const shouldRenderTimeout = setTimeout(() => {
                 setShouldRenderMain(true);
             }, 800);
-
+    
             return { shouldRenderTimeout };
         };
 
@@ -121,11 +110,12 @@ function Hud() {
 };
 
 export default function ProtectedHud() {
-    const { serverUrl } = useServerContext();
+    const { serverUrl } = useSelectedServerContext();
     const [walletAddress, setWalletAddress] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useVirusAnimation();
+    usePlanetRender();
 
     useEffect(() => {
         const localStorageWalletAddress = localStorage.getItem("aptAddress");

@@ -1,133 +1,65 @@
-import axios from "axios";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 
 import Head from "next/head";
-import { useRouter } from "next/router";
-import usePlanet from "@hooks/usePlanet";
 
 import { Header } from "@components/Header/Header";
 import { Planet } from "@components/Planet/Planet";
 import { PlanetList } from "@components/PlanetList/PlanetList";
 import { PlanetDataList } from "@components/PlanetDataList/PlanetDataList";
 import { PayMethod } from "@components/PayMethod/PayMethod";
-import { PlanetScripts } from "@components/PlanetScripts/PlanetScripts";
-import useContractServers from "@hooks/useContractServers";
-
-const DEFAULT_GATEWAY = "gateway.ipfs.io";
-
-const IPFS_GATEWAYS = [
-    "gateway.ipfs.io",
-    "ipfs.io",
-    "infura-ipfs.io",
-    "cloudflare-ipfs.com",
-    "dweb.link",
-    "ipfs.fleek.co",
-    "ipfs.lain.la",
-    "nftstorage.link",
-    "ipfs.infura.io",
-    "ipfs.telos.miami",
-    "ipfs.eth.aragon.network",
-    "via0.com",
-    "gateway.pinata.cloud"
-];
+import ServerSelector from "@components/ServerSelector/ServerSelector";
+import { useSelectedServerContext } from "@context/SelectedServerContext";
+import { useContractServersContext } from "@context/ContractServersContext";
 
 export default function Dashboard() {
-    const router = useRouter();
     const [mintHash, setMintHash] = useState("");
     const [planetsAvailable, setPlanetsAvailable] = useState([]);
     const [planetSelected, setPlanetSelected] = useState(0);
 
-    const { contractServers, selectedServerIndex } = useContractServers();
+    const { serverName: selectedServerName } = useSelectedServerContext();
+    const { contractServers, selectedServerIndex } = useContractServersContext();
 
-    const { isPlanetInitialized, setArePlanetScriptsReady } =
-        usePlanet(mintHash);
+    const isSelectedServerAvailable = useMemo(() => {
+        const selectedServer = contractServers[selectedServerIndex];
 
-    useEffect(() => {
-    const promisify = (gateway) => {
-        return new Promise((resolve, reject) => {
-            try {
-                axios
-                    .get(
-                        `https://${gateway}/ipfs/QmaXjh2fxGMN4LmzmHMWcjF8jFzT7yajhbHn7yBN7miFGi`
-                    )
-                    .then((res) => {
-                        console.log(res.status);
-                        resolve(gateway);
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                    });
-            } catch (e) {
-                reject();
-            }
-        });
-    };
+        if (!selectedServer) return false;
 
-    const ipfsRace = async () => {
-        const promiseList = [];
-
-            for (let gateway of IPFS_GATEWAYS) {
-            promiseList.push(promisify(gateway));
-        }
-
-        const winner = await Promise.race(promiseList);
-        localStorage.setItem("ipfs-gateway", winner);
-    };
-
-        ipfsRace();
-    }, []);
-
-    const getGateway = useCallback(() => {
-        if (typeof window === "undefined") {
-            return DEFAULT_GATEWAY;
-        }
-
-        const localStorageGateway = localStorage.getItem("ipfs-gateway");
-
-        if (!localStorageGateway) {
-            return DEFAULT_GATEWAY;
+        if (selectedServer.isFull || selectedServer.isGameRunning) {
+            return false
+        } else {
+            return true;
         };
+    }, [contractServers, selectedServerIndex]);
 
-        return localStorageGateway;
-    }, []);
-
-    const getDemoPlanet = useCallback((gateway) => {
+    const getDemoPlanet = useCallback(() => {
         return {
             gen_hash: "ooKg2zuJu9XhZBRKQaBrEDvpeYZjDPmKREp3PMSZHLkoSFK3ejN",
-            img_link: `https://${gateway}/ipfs/QmaXjh2fxGMN4LmzmHMWcjF8jFzT7yajhbHn7yBN7miFGi`,
             token_id: "DEMO PLANET"
         };
     }, []);
 
     useEffect(() => {
+        // If not logged in
+        // if (!address) {
+        //     const demoPlanet = getDemoPlanet();
+
+        //     setPlanetsAvailable([demoPlanet]);
+        //     return;
+        // }
+
         const fetchPlanets = () => {
-            const gateway = getGateway();
-            setPlanetsAvailable([ getDemoPlanet(gateway) ]);
-        };
+            // Fetching planets logic
+    };
 
         fetchPlanets();
     }, []);
 
     useEffect(() => {
-        if (typeof selectedServerIndex == "undefined" || !serverList.length)
-            return;
-        localStorage.setItem(
-            "APTOSTRIKE_SERVER_URL",
-            serverList[selectedServerIndex].server_url
-        );
-        localStorage.setItem(
-            "APTOSTRIKE_SERVER_NAME",
-            serverList[selectedServerIndex].name
-        );
-    }, [selectedServerIndex]);
-
-    useEffect(() => {
         if (planetsAvailable.length === 0) return;
 
-            const selected = planetsAvailable[planetSelected];
-            setMintHash(selected.gen_hash);
-            localStorage.setItem("mintHash", selected.gen_hash);
-            localStorage.setItem("skinLink", selected.img_link);
+        const selected = planetsAvailable[planetSelected];
+        setMintHash(selected.gen_hash);
+        localStorage.setItem("mintHash", selected.gen_hash);
     }, [planetSelected, planetsAvailable]);
 
     return (
@@ -135,9 +67,6 @@ export default function Dashboard() {
             <Head>
                 <title>Dashboard - AptoStrike.space</title>
             </Head>
-            <PlanetScripts
-                onScriptsReady={() => setArePlanetScriptsReady(true)}
-            />
 
             <Header />
 
@@ -148,26 +77,24 @@ export default function Dashboard() {
                         setPlanetSelected={setPlanetSelected}
                         planetSelected={planetSelected}
                     />
+                    <ServerSelector />
                 </div>
 
                 <div className="dashboard__center">
                     <img src="/img/bg-planet.png" className="planet_outline" />
-                    <Planet isPlanetReady={isPlanetInitialized} />
+                    <Planet mintHash={mintHash} />
                     <PayMethod />
                 </div>
 
                 <div className="dashboard__right">
-                    <PlanetDataList
-                        isPlanetReady={isPlanetInitialized}
-                        mintHash={mintHash}
-                    />
+                    <PlanetDataList mintHash={mintHash} />
                 </div>
 
-                <a className='btn btn--center btn--wide'>
+                <button className='btn btn--center btn--wide'>
                     <span className='btn__iconPlus'></span> MINT NEW PLANET
-                </a>
+                </button>
 
-                <a className=' btn btn--center'>PLAY</a>
+                <button className=' btn btn--center'>PLAY</button>
             </main>
         </>
     );

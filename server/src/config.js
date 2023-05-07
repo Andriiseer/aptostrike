@@ -66,8 +66,8 @@ module.exports = Object.seal({
   "serverChat": 0,
   "serverChatAscii": 1,
   "separateChatForTeams": 0,
-  "serverName": "MultiOgarII #1",
-  "serverWelcome1": "Welcome to MultiOgarII!",
+  "serverName": "AptoStrike.space",
+  "serverWelcome1": "Welcome to AptoStrike.space!",
   "serverWelcome2": "",
   "clientBind": "",
 
@@ -95,10 +95,13 @@ module.exports = Object.seal({
   // foodMaxSize: vanilla 20 (mass: 20*20/100: 4 mass)
   // foodAmount: The number of food to spawn
   // foodMassGrow: Enable food mass grow ?
-  "foodMinSize": 5,
-  "foodMaxSize": 15,
-  "foodAmount": 15000,
+  // foodMassEatingCoef: Food eating mass multiplier - how much mass cells gain...
+  // .. from eating food (1: default, 2: two times more mass)
+  "foodMinSize": 1,
+  "foodMaxSize": 25,
+  "foodAmount": 3000,
   "foodMassGrow": 1,
+  "foodMassEatingCoef": 3,
 
   // [VIRUSES]
   // virusMinSize: Minimum virus size. (vanilla: mass: val*val/100: 100 mass)
@@ -111,10 +114,10 @@ module.exports = Object.seal({
   // virusVelocity: Velocity of moving viruses (speed and distance)
   // virusMaxCells: Maximum cells a player is allowed to have from virus splits (0 for playerMaxCells)
   "virusMinSize": 100,
-  "virusMaxSize": 141.421356237,
+  "virusMaxSize": 100,
   "virusMaxPoppedSize": 60,
   "virusEqualPopSize": 0,
-  "virusAmount": 50,
+  "virusAmount": 30,
   "virusMaxAmount": 100,
   "motherCellMaxMass": 0,
   "virusVelocity": 780,
@@ -151,12 +154,12 @@ module.exports = Object.seal({
   // playerDisconnectTime: Time in seconds before a disconnected player's cell is removed from the server (Set to -1 to never remove)
   // splitVelocity: Velocity of splitting playercells (speed and distance)
   "playerMinSize": 31.6227766017,
-  "playerMaxSize": 400,
+  "playerMaxSize": 489.897948557,
   "playerMinSplitSize": 59.16079783,
   "playerMinEjectSize": 59.16079783,
   "playerStartSize": 31.6227766017,
-  "playerMaxCells": 16,
-  "playerSpeed": 1,
+  "playerMaxCells": 10,
+  "playerSpeed": 1.5,
   "playerDecayRate": 0.002,
   "playerDecayCap": 0,
   "playerRecombineTime": 30,

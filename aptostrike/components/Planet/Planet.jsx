@@ -1,23 +1,26 @@
-import React from "react";
-import { Shaders } from "./Shaders";
+import React, { useRef } from "react";
+import usePlanet from "@hooks/usePlanet";
 
-export function Planet({ isPlanetReady }) {
+export function Planet({ mintHash }) {
+    const planetCanvasRef = useRef(null);
+
+    const { isPlanetLoaded } = usePlanet(mintHash, planetCanvasRef);
+
     return (
         <div className="planet">
-            <Shaders />
-            {isPlanetReady || (
+            {isPlanetLoaded || (
                 <p className="planet--loading-text">
                     Loading NFT, please wait...
                 </p>
             )}
             <div
                 className={`planet-canvas-wrapper ${
-                    !isPlanetReady
+                    !isPlanetLoaded
                         ? "planet__canvas-wrapper--not-displayed"
                         : ""
                 }`.trimEnd()}
             >
-                <canvas id="c" width="800" height="800"></canvas>
+                <canvas ref={planetCanvasRef}></canvas>
             </div>
         </div>
     );

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { Planet } from "@components/Planet/Planet";
 import { Header } from "@components/Header/Header";
-import usePlanet from "@hooks/usePlanet";
-import { PlanetScripts } from "@components/PlanetScripts/PlanetScripts";
-import { useServerContext } from '@context/ServerContext';
+import { useSelectedServerContext } from '@context/SelectedServerContext';
 
 export default function WaitingRoom() {
     const [waitRoom, setWaitRoom] = useState([]);
@@ -13,12 +11,7 @@ export default function WaitingRoom() {
     const [mintHash, setMintHash] = useState("");
     const router = useRouter();
 
-    const {
-        isPlanetInitialized,
-        setArePlanetScriptsReady
-    } = usePlanet(mintHash);
-
-    const { serverName } = useServerContext();
+    const { serverName } = useSelectedServerContext();
 
     const refund = async () => {
         // Refund contract logic
@@ -30,7 +23,6 @@ export default function WaitingRoom() {
             <Head>
                 <title>Waiting room - AptoStrike.space</title>
             </Head>
-            <PlanetScripts onScriptsReady={() => setArePlanetScriptsReady(true)} />
 
             <Header />
 
@@ -72,7 +64,7 @@ export default function WaitingRoom() {
 
                 <div className='page__center'>
                     <div className='planet__wrapper--flex-gap'>
-                        <Planet isPlanetReady={isPlanetInitialized} />
+                        <Planet mintHash={mintHash} />
 
                         <a className='btn btn--center' onClick={() => refund()}>
                             Leave room

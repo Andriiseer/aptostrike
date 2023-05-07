@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import { useServerContext } from '@context/ServerContext';
+import { useSelectedServerContext } from '@context/SelectedServerContext';
 
 const PROGRESS_TIMER_LENGTH = 30;
 
@@ -12,7 +12,7 @@ const useGameProgressTimer = (blocksRemaining) => {
         setOptimisticGameRemainingPercentage
     ] = useState(null);
 
-    const { serverName } = useServerContext();
+    const { serverName } = useSelectedServerContext();
 
     // Checking if initial data is loaded and valid
     const isDataLoadedAndValid = useMemo(

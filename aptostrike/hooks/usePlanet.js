@@ -1,29 +1,22 @@
 import { useState, useEffect } from "react";
+import PlanetRender from "@services/planet/PlanetRender";
 
-const usePlanet = (mintHash) => {
-    const [arePlanetScriptsReady, setArePlanetScriptsReady] = useState(false);
-    const [isPlanetInitialized, setIsPlanetInitialized] = useState(false);
+const usePlanet = (mintHash, planetCanvasRef) => {
+    const [isPlanetLoaded, setIsPlanetLoaded] = useState(false);
 
     useEffect(() => {
-        if (!mintHash || !arePlanetScriptsReady) return;
+        if (!mintHash) return;
 
-        const loadPlanet = () => {
-            localStorage.setItem("hash", mintHash);
-            window.hashGen();
-            window.main();
-            window.initPlanet(mintHash).then(() => {
-                setIsPlanetInitialized(true);
-            });
-        };
+        localStorage.setItem("hash", mintHash);
+        const planet = new PlanetRender(mintHash, planetCanvasRef);
+        planet.initAnimation();
 
-        setIsPlanetInitialized(false);
-        loadPlanet();
-    }, [mintHash, arePlanetScriptsReady]);
+        setIsPlanetLoaded(true);
 
-    return {
-        isPlanetInitialized,
-        setArePlanetScriptsReady
-    };
+        return () => planet.stopAnimation();
+    }, [ mintHash ]);
+
+    return { isPlanetLoaded };
 };
 
 export default usePlanet;

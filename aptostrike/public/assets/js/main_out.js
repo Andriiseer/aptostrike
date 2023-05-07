@@ -224,7 +224,7 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
 
     const WEBSOCKET_URL = null;
     const SKIN_URL = '/assets/skins/';
-    const USE_HTTPS = true; // false when using local server
+    const USE_HTTPS = !(localStorage.getItem("SHOULD_USE_DEV_SERVER") === "true"); // false when using local server
     const EMPTY_NAME = 'An unnamed cell';
     const QUADTREE_MAX_POINTS = 32;
     const CELL_POINTS_MIN = 5;
@@ -644,7 +644,7 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
     let quadtree;
     const settings = {
         nick: localStorage.getItem('aptAddress'),
-        skin: localStorage.getItem("skinLink"),
+        skin: localStorage.getItem("mintHash"),
         gamemode: '',
         showSkins: true,
         showNames: true,
@@ -1153,10 +1153,10 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
             mainCtx.drawImage(stats.canvas, 2, height);
             
             // Drawing fps & ping
-        mainCtx.textBaseline = 'top';
+            mainCtx.textBaseline = 'top';
             mainCtx.fillStyle = settings.darkTheme ? '#AAA' : '#555';
             mainCtx.font = '14px Ubuntu';
-        const gameStatsText = `${~~stats.fps} FPS` + (isNaN(stats.latency) ? '' : ` ${stats.latency}ms ping`);
+            const gameStatsText = `${~~stats.fps} FPS` + (isNaN(stats.latency) ? '' : ` ${stats.latency}ms ping`);
             height += 79;
             mainCtx.fillText(gameStatsText, 4, height);
         }
@@ -1396,9 +1396,11 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
             this.skin = (value && value[0] === '%' ? value.slice(1) : value) || this.skin;
             if (!this.skin) {
                 return;
-            }
-            const skin = new Image();
-            skin.src = this.skin;
+            };
+
+            if (loadedSkins.has(this.skin)) return;
+
+            const skin = new PlanetRender(this.skin);
             
             loadedSkins.set(this.skin, skin);
         }
@@ -1475,14 +1477,16 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
                 return;
             }
 
-            const skinImage = loadedSkins.get(this.skin);
-            if (settings.showSkins && this.skin && skinImage &&
-                skinImage.complete && skinImage.width && skinImage.height) {
+            if (settings.showSkins && this.skin) {
                 if (settings.fillSkin) ctx.fill();
+                const animatedPlanet = loadedSkins.get(this.skin);
+                const drawingSize = this.s * 2;
+                // Rendering using 10x speed
+                const animatedPlanetCanvas = animatedPlanet.getCurrentFrame(drawingSize, 10);
                 ctx.save(); // for the clip
                 ctx.clip();
-                ctx.drawImage(skinImage, this.x - this.s * 2, this.y - this.s * 2,
-                    this.s * 4, this.s * 4);
+                ctx.drawImage(animatedPlanetCanvas, this.x - this.s, this.y - this.s,
+                    drawingSize, drawingSize);
                 ctx.restore();
             } else {
                 ctx.fill();

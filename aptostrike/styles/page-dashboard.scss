@@ -4,12 +4,15 @@
 	grid-template-rows: minmax(63vh, 600px) 60px;
 	row-gap: 24px;
 	grid-template-areas:
-	"left center right";
+		"left center right";
 	margin-bottom: 50px;
 
 	&__left {
 		grid-area: left;
 		margin-top: 10vh;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
 	}
 
 	&__center {

@@ -5,24 +5,16 @@ import { Header } from '@components/Header/Header';
 import { Planet } from '@components/Planet/Planet';
 import { PlanetDataList } from '@components/PlanetDataList/PlanetDataList';
 import { StatList } from '@components/StatList/StatList';
-import { PlanetScripts } from '@components/PlanetScripts/PlanetScripts';
-import usePlanet from '@hooks/usePlanet';
 
 
 export default function Leaderboard() {
     const [hash, setHash] = useState('opKnKPLvxekWsTEZqXUEqmsTCN95tHMtiKVnTbN7qX2uersNYE2');
-
-    const {
-        isPlanetInitialized,
-        setArePlanetScriptsReady
-    } = usePlanet(hash);
 
     return (
         <>
             <Head>
                 <title>Leaderboard - AptoStrike.space</title>
             </Head>
-            <PlanetScripts onScriptsReady={() => setArePlanetScriptsReady(true)} />
 
             <Header/>
             
@@ -34,16 +26,12 @@ export default function Leaderboard() {
                     </div>
 
                     <div className="leaderBoard__center">
-                        <Planet isPlanetReady={isPlanetInitialized}/>
+                        <Planet mintHash={hash} />
                         <a className="leaderBoard__btn btn btn--center" href="#">BUY</a>
                     </div>
                     
                     <div className="leaderBoard__right">
-                        <PlanetDataList
-                            className='planetData--clear'
-                            isPlanetReady={isPlanetInitialized}
-                            mintHash={hash}
-                        />
+                        <PlanetDataList mintHash={hash} />
                     </div>
 
                     <div className="leaderBoard__bg">
@@ -57,4 +45,4 @@ export default function Leaderboard() {
             </main>
         </>
     )
-}
+};
