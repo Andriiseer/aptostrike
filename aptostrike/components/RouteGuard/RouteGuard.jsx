@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-const RouteGuard = ({ children, isAllowed, redirectUrl, isLoading }) => {
+const RouteGuard = ({ children, isAllowed, redirectUrl, isLoading = false }) => {
     const router = useRouter();
 
     useEffect(() => {

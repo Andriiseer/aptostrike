@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 export function PlanetList({ setPlanetSelected, planetsAvailable, planetSelected }) {
     return (
         <div className="planetsList">
@@ -6,11 +8,11 @@ export function PlanetList({ setPlanetSelected, planetsAvailable, planetSelected
             {planetsAvailable.length > 0 && 
                 planetsAvailable.map((planet, index) => 
                     <li 
-                        key={'planet' + planet.token_id}
+                        key={'planet' + planet.tokenId}
                         onClick={() => setPlanetSelected(index)} 
                         className={`planetsList__item ${index === planetSelected ? 'planetsList__item--active' : ''}`} 
                     >
-                        { planet.token_id }
+                        { planet.name }
                     </li>)
             }
             {!planetsAvailable.length && 

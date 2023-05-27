@@ -1,9 +1,12 @@
+import React from 'react';
 import Link             from 'next/link';
-import Image            from 'next/image';
+import Image            from "next/legacy/image";
 import { useRouter }    from 'next/router';
-
+import useBalance from "@hooks/useBalance";
+import { WalletConnector } from "@aptos-labs/wallet-adapter-mui-design";
 
 export function Header() {
+    const { data: balance = 0 } = useBalance();
     const router = useRouter();
     
     let link = '/leaderboard';
@@ -14,48 +17,37 @@ export function Header() {
         link = "/dashboard"
         linkText = "Back";
         linkIcon = '/img/icon-back.png';
-    }
+    };
 
     return (
         <header className="header container">
             <div className="header__linkBlock">
-                <Image 
-                    className="header__icon" 
-                    src={linkIcon} 
-                    layout="fixed" 
-                    width={21} 
+                <Image
+                    className="header__icon"
+                    src={linkIcon}
+                    layout="fixed"
+                    width={21}
                     height={31}
                     alt=""
                 />
-                <Link href={link}>
-                    <a className="header__link">
-                        {linkText}
-                    </a>
+                <Link href={link} className="header__link" legacyBehavior>
+                    {linkText}
                 </Link>
             </div>
 
             <div className="header__money money">
                 <div className="money__item">
                     <p className="money__name">APT</p>
-                    <p className="money__num">165.52</p>
-                </div>
-                <div className="money__item">
-                    <div className="money__name">LP</div>
-                    <div className="money__num">0</div>
+                    <p className="money__num">
+                        {balance.toFixed(2)}
+                    </p>
                 </div>
             </div>
 
             <div className="header__linkBlock">
-                <Image 
-                    className="header__icon" 
-                    src="/img/icon-log-out.png" 
-                    layout="fixed" 
-                    width={43} 
-                    height={34}
-                    alt=""
-                />
-                <a className="header__link">Connect wallet</a>
+                <WalletConnector />
             </div>
         </header>
-    )
+    );
 }
+

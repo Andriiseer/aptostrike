@@ -1,10 +1,17 @@
-const getHashes = (planethash) => {
+const getHashes = (planetHash) => {
     //---- do not edit the following code (you can indent as you wish)
     const alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
     // "oo" + Array(49).fill(0).map(_ => alphabet[(Math.random() * alphabet.length) | 0]).join('')
-    const b58dec = (str) => str.split('').reduce((p, c, i) => p + alphabet.indexOf(c) * (Math.pow(alphabet.length, str.length - i - 1)), 0)
-    const hashTrunc = planethash.slice(2)
-    const regex = new RegExp(".{" + ((planethash.length / 4) | 0) + "}", 'g')
+    const b58dec = (str) => {
+        return [...str].reduce((p, c) => (p * alphabet.length + alphabet.indexOf(c)) | 0, 0)
+    };
+
+    const getRegEx = () => {
+        return new RegExp(".{" + ((hashTrunc.length / 4) | 0) + "}", 'g');
+    };
+
+    const hashTrunc = planetHash.slice(2);
+    const regex = getRegEx();
     const hashes = hashTrunc.match(regex).map(h => b58dec(h));
     //---- /do not edit the following code
 
@@ -24,7 +31,7 @@ const sfc32 = (a, b, c, d) => {
     }
 };
 
-export const getRandGenForHash = (planethash) => {
-    const hashes = getHashes(planethash);
+export const getRandGenForHash = (planetHash) => {
+    const hashes = getHashes(planetHash);
     return sfc32(...hashes);
 };

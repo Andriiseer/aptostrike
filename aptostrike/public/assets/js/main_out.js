@@ -224,7 +224,7 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
 
     const WEBSOCKET_URL = null;
     const SKIN_URL = '/assets/skins/';
-    const USE_HTTPS = !(localStorage.getItem("SHOULD_USE_DEV_SERVER") === "true"); // false when using local server
+    const USE_HTTPS = false
     const EMPTY_NAME = 'An unnamed cell';
     const QUADTREE_MAX_POINTS = 32;
     const CELL_POINTS_MIN = 5;
@@ -642,9 +642,10 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
     let mouseY = NaN;
     let macroIntervalID;
     let quadtree;
+    const playingPlanet = JSON.parse(localStorage.getItem("selectedPlanet"));
     const settings = {
         nick: localStorage.getItem('aptAddress'),
-        skin: localStorage.getItem("mintHash"),
+        skin: `${playingPlanet.genHash}`,
         gamemode: '',
         showSkins: true,
         showNames: true,
@@ -1471,8 +1472,8 @@ const VIRUS_SKIN_SRC = "img/game-virus-anim.gif";
                 const skinImage = loadedSkins.get(FOOD_SKIN_SRC);
                 ctx.save(); // for the clip
                 ctx.clip();
-                ctx.drawImage(skinImage, this.x - this.s * 2, this.y - this.s * 2,
-                    this.s * 4, this.s * 4);
+                ctx.drawImage(skinImage, this.x - this.s, this.y - this.s,
+                    this.s * 2, this.s * 2);
                 ctx.restore();
                 return;
             }

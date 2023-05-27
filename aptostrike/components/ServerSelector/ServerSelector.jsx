@@ -34,10 +34,10 @@ const ServerSelector = () => {
     );
 
     const readyStateContent = useMemo(() => {
-        const selectedServer = contractServers[selectedServerIndex];
-        const areButtonsDisabled = contractServers.length === 1;
+        const selectedServer = contractServers?.[selectedServerIndex];
+        const areButtonsDisabled = contractServers?.length === 1;
 
-        const { isFull, isGameRunning } = contractServers[selectedServerIndex] ?? {};
+        const { isFull, isGameRunning } = contractServers?.[selectedServerIndex] ?? {};
         const isServerUnavailable = isFull || isGameRunning;
 
         return (
@@ -62,6 +62,7 @@ const ServerSelector = () => {
                         place="top"
                         type="dark"
                         effect="solid"
+                        className="tooltip"
                     >
                         {isGameRunning
                             ? MESSAGES.isGameRunning

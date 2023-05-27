@@ -1,7 +1,21 @@
 .header {
-	display: flex;
-	justify-content: space-between;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
 	align-items: center;
+
+	> :first-child {
+		justify-self: start;
+	};
+
+	> :nth-child(2) {
+		justify-self: center;
+	};
+
+	> :last-child {
+		justify-self: end;
+		justify-content: flex-end;
+	};
+
 	padding-top: 20px;
 	padding-bottom: 20px;
 
@@ -10,36 +24,26 @@
 		align-items: center;
 	}
 
+	&__address-text {
+		font-size: 1.375rem;
+	}
+
 	&--hud {
-		> :first-child, > :last-child {
-			flex-grow: 1;
-			flex-basis: 0;
-		}
 		align-items: flex-start;
 		pointer-events: none;
 		position: absolute;
 		inset: 0 0 auto;
 		z-index: 1;
-
-		.ingame-leaderboard-wrapper {
-			display: flex;
-			justify-content: flex-start;
-		};
-	
-		.linkBlock-wrapper {
-			display: flex;
-			justify-content: flex-end;
-		};
 	}
 
 	&__linkBlock {
 		display: flex;
+		gap: 0.75rem;
 		pointer-events: all;
 		min-width: 200px;
 	}
 
 	&__link {
-		margin-inline-start: 12px;
 		text-decoration: underline;
 		cursor: pointer;
 	}
@@ -104,7 +108,13 @@
 
 @media (max-width: 768px) { //------------------------------------------------------------------------------------ 768
 	.header {
-		flex-wrap: wrap;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+
+		> :first-child, > :nth-child(2), > :last-child {
+			justify-self: center;
+		};
+
 		padding-top: 15px;
     	padding-bottom: 15px;
 

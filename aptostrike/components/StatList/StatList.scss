@@ -38,6 +38,12 @@
 		}
 	}
 
+	&__loading {
+		text-align: center;
+		padding: 10rem;
+		font-size: 1.5rem;
+	}
+
 	&__rank {
 		min-width: 25px;
 		margin-inline-end: 10px;

@@ -1,10 +1,29 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { BigNumber } from "bignumber.js";
+import { useRouter } from 'next/router'
+import { useQuery } from "@tanstack/react-query";
 import { useSelectedServerContext } from '@context/SelectedServerContext';
+import {
+    SHOULD_USE_LOCAL_DEV_SERVER,
+    LOCAL_DEV_SERVER
+} from "../constants";
+import fetchContractServers from "@services/contractServers/fetchContractServers";
 
 const useContractServers = () => {
-    const [contractServers, setContractServers] = useState([]);
-    const [selectedServerIndex, setSelectedServerIndex] = useState(null);
+    const [
+        selectedServerIndex,
+        setSelectedServerIndex
+    ] = useState(null);
+
+    const router = useRouter();
+
+    const { data: contractServers } = useQuery({
+        queryKey: [ "contractServers" ],
+        queryFn: () => fetchContractServers(),
+        // New data on key change will be swapped without the loading state
+        keepPreviousData: true,
+        // Refetching only when on /dashboard page
+        refetchInterval: () => router.pathname === "/dashboard" ? 5000 : false,
+    });
 
     const {
         serverUrl: savedServerUrl,
@@ -13,71 +32,38 @@ const useContractServers = () => {
         setStatsUrl
     } = useSelectedServerContext();
 
-    const calculateServerState = useCallback((serverData) => {
-        const {
-            name: serverName,
-            rooms: serverRooms,
-            players: serverPlayers
-        } = serverData;
-        const mainRoom = serverRooms.get(`"${serverName}"`);
-
-        // Checking if the server is full
-        let isFull = false;
-
-        const maxPlayers = mainRoom.size.toNumber();
-        const currentNumberOfPlayers = serverPlayers.length;
-
-        if (maxPlayers === currentNumberOfPlayers) {
-            isFull = true;
-        }
-
-        // Checking if the game is currently running
-        let isGameRunning = false;
-
-        const isFinishBlockPresent = !mainRoom.finish_block.isZero();
-
-        if (isFinishBlockPresent) {
-            isGameRunning = true;
-        }
-
-        return {
-            isFull,
-            isGameRunning
-        };
-    }, []);
-
+    // Handling selectedServerIndex
     useEffect(() => {
-        const fetchServerList = async () => {
-            // fetching servers logic
-
-            if (!savedServerUrl) {
-                setSelectedServerIndex(0);
-                return;
-            }
-            
+        if (SHOULD_USE_LOCAL_DEV_SERVER || !savedServerUrl) {
             setSelectedServerIndex(0);
-
-        if (SHOULD_USE_DEV_SERVER) {
-            setContractServers([DEV_SERVER.data]);
-            setSelectedServerIndex(0);
-            sessionStorage.setItem("SHOULD_USE_DEV_SERVER", "true");
             return;
         };
 
-        fetchServerList();
-    }, []);
+        if (!contractServers) return;
+
+        const savedServerIndex = contractServers.findIndex(
+            (contractServer) => contractServer.server_url === savedServerUrl
+        );
+
+        if (savedServerIndex === -1) {
+            setSelectedServerIndex(0);
+            return;
+        }
+
+        setSelectedServerIndex(savedServerIndex);
+    }, [ contractServers ]);
 
     // Setting selected server to context & localStorage
     useEffect(() => {
-        if (selectedServerIndex == null || !contractServers.length) return;
+        if (selectedServerIndex == null || !contractServers) return;
 
         const selectedServerUrl =
             contractServers[selectedServerIndex].server_url;
         const selectedServerName = contractServers[selectedServerIndex].name;
         const sanitizedSelectedServerName = selectedServerName.replaceAll('"', "");
         const baseServerUrl = selectedServerUrl.match(/^(?:server.)(.*)/)?.[1];
-        const selectedServerStatsUrl = SHOULD_USE_DEV_SERVER
-            ? DEV_SERVER.statsServerUrl
+        const selectedServerStatsUrl = SHOULD_USE_LOCAL_DEV_SERVER
+            ? LOCAL_DEV_SERVER.statsServerUrl
             : `stats.${baseServerUrl}`;
 
         setServerName(sanitizedSelectedServerName);
@@ -85,10 +71,10 @@ const useContractServers = () => {
         setStatsUrl(selectedServerStatsUrl);
     }, [contractServers, selectedServerIndex]);
 
-    // Setting env variable SHOULD_USE_DEV_SERVER for access from public/main_out.js file
+    // Setting env variable SHOULD_USE_LOCAL_DEV_SERVER for access from public/main_out.js file
     useEffect(() => {
-        localStorage.setItem("SHOULD_USE_DEV_SERVER", SHOULD_USE_DEV_SERVER);
-    }, []);
+        localStorage.setItem("SHOULD_USE_LOCAL_DEV_SERVER", SHOULD_USE_LOCAL_DEV_SERVER);
+    }, [ SHOULD_USE_LOCAL_DEV_SERVER ]);
 
     const selectNextServer = useCallback(() => {
         if (contractServers.length === selectedServerIndex + 1) {
@@ -109,7 +95,7 @@ const useContractServers = () => {
     }, [contractServers, selectedServerIndex]);
 
     const isLoading = useMemo(
-        () => contractServers.length === 0 || selectedServerIndex === null,
+        () => !contractServers || selectedServerIndex === null,
         [contractServers, selectedServerIndex]
     );
 

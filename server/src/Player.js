@@ -113,7 +113,30 @@ class Player {
         return Math.max(scale, this.server.config.serverMinScale)
     }
     joinGame(name, skin) {
-        if (this.cells.length) return;
+        if (process.env.STAGE !== 'local') {
+            const allowedPlayers = new Set(this.server.mode.playersInRoom);
+            const parsedName = name.match(/(?:<.*>)?([\w\d]+)/)?.[1];
+            const alivePlayers = new Set(this.server.clients.flatMap((socket) => {
+                const { player } = socket;
+
+                if (!player || !player.cells || player.cells.length === 0) return [];
+
+                return [ player._name ];
+            }));
+        
+            // Not allowing players to join when:
+            // - the game session has not yet started
+            // - player's name is not in the contract storage
+            // - there's already an alive player with the same name
+            // - current player has cells in game
+            if (
+                allowedPlayers.size === 0 ||
+                !allowedPlayers.has(parsedName) ||
+                alivePlayers.has(name) ||
+                this.cells.length
+            ) return;
+        };
+
         if (skin) this.setSkin(skin);
         if (!name) name = "";
         this.setName(name);

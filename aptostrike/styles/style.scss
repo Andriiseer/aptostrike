@@ -14,8 +14,10 @@
 @import "@components/InGameLeaderboard/InGameLeaderboard.scss";
 @import "@components/GameProgressTimer/GameProgressTimer.scss";
 @import "@components/ServerSelector/ServerSelector.scss";
+@import "@components/Message/Message.scss";
 
 // Pages
 @import "page-dashboard.scss";
 @import "page-leaderboard.scss";
+@import "page-waiting-room.scss";
 @import "page-hud.scss";

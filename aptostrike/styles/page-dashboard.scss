@@ -1,16 +1,19 @@
 .dashboard {
 	display: grid;
 	grid-template-columns: minmax(250px, 350px) 1fr minmax(250px, 350px);
-	grid-template-rows: minmax(63vh, 600px) 60px;
-	row-gap: 24px;
-	grid-template-areas:
-		"left center right";
+	grid-template-rows: minmax(63vh, 600px) 2rem;
+	row-gap: 1.25rem;
+	grid-template-areas: 
+		"left center right"
+		". message ."
+		"mint play deploy";
 	margin-bottom: 50px;
 
 	&__left {
 		grid-area: left;
 		margin-top: 10vh;
 		display: flex;
+		gap: 5rem;
 		flex-direction: column;
 		justify-content: space-between;
 	}
@@ -31,6 +34,23 @@
 		grid-area: right;
 		margin-top: 10vh;
 	}
+
+	&__area-message {
+		grid-area: message;
+		place-self: center;
+	}
+
+	&__area-mint {
+		grid-area: mint;
+	}
+
+	&__area-play {
+		grid-area: play;
+	}
+
+	&__area-deploy {
+		grid-area: deploy;
+	}
 }
 
 @media (max-width: 1280px) { //------------------------------------------------------------------------------------ 1280
@@ -45,9 +65,12 @@
 	.dashboard {
 		grid-template-columns: 1fr 1fr;
 		grid-template-rows: auto;
-		grid-template-areas:
-		"left right"
-		"center center";
+		grid-template-areas: 
+			"left right"
+			"center center"
+			". message"
+			"mint play"
+			"deploy .";
 		column-gap: 24px;
 
 		&__left {
@@ -73,10 +96,14 @@
 @media (max-width: 640px) { //------------------------------------------------------------------------------------ 640
 	.dashboard {
 		grid-template-columns: 1fr;
-		grid-template-areas:
-		"left"
-		"center"
-		"right";
+		grid-template-areas: 
+			"left"
+			"center"
+			"right"
+			"mint"
+			"message"
+			"play"
+			"deploy";
 	}
 }
 

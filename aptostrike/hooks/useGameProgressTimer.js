@@ -45,7 +45,7 @@ const useGameProgressTimer = (blocksRemaining) => {
 
         const percentagePerUpdate = 100 / PROGRESS_TIMER_LENGTH;
         const percentagePerBlock = Number.parseFloat(
-            (100 / (PROGRESS_TIMER_LENGTH / gameDuration)).toFixed(2)
+            (100 / gameDuration).toFixed(2)
         );
 
         const gameDurationInSeconds = blockDuration * gameDuration;
@@ -55,7 +55,8 @@ const useGameProgressTimer = (blocksRemaining) => {
         const handleOptimisticUpdates = () => {
             setOptimisticGameRemainingPercentage((prevOptimisticPercentage) => {
                 // Difference between real and optimistic percentages
-                const optimisticDiff = Number.parseFloat((realGameRemainingPercentage - prevOptimisticPercentage).toFixed(2));
+                const newOptimisticGameRemainingPercentage = prevOptimisticPercentage - percentagePerUpdate;
+                const optimisticDiff = Number.parseFloat((realGameRemainingPercentage - newOptimisticGameRemainingPercentage).toFixed(2));
 
                 // Keeping the same percentage value, when all midpoint ...
                 // .. updates per block were done 
@@ -64,7 +65,7 @@ const useGameProgressTimer = (blocksRemaining) => {
                 };
 
                 // Returning new optimistic percentage value
-                return prevOptimisticPercentage - percentagePerUpdate;
+                return newOptimisticGameRemainingPercentage;
             });
         };
 

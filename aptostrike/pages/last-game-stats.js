@@ -1,15 +1,33 @@
-import React from 'react';
-import Head from 'next/head'
-import { useRouter } from 'next/router';
+import React, { useCallback, useMemo } from "react";
+import Head from "next/head";
+import { useRouter } from "next/router";
 
-import { Header } from '@components/Header/Header';
+import { Header } from "@components/Header/Header";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
 
 export default function LastGameStats() {
-    const router = useRouter()
+    const { account } = useWallet();
 
-    const payDividends = () => {
-      // Pay Dividends Contract Logic
-    }
+    const router = useRouter();
+
+    const leaderboard = useMemo(() => [
+        {
+            address: account?.address,
+            amount: 1523,
+        },
+        {
+            address: "jigglypuff.apt",
+            amount: 853,
+        },
+        {
+            address: "lone-wanderer.apt",
+            amount: 536,
+        },
+    ], [account?.address]);
+
+    const payDividends = useCallback(() => {
+        // Pay Dividends Contract Logic
+    }, []);
 
     return (
         <div className="background">
@@ -17,29 +35,45 @@ export default function LastGameStats() {
                 <title>Game Winners - AptoStrike.space</title>
             </Head>
             <Header />
-            <main className='container container--small'>
-
+            <main className="container container--small">
                 <div className="statList statList--wide">
                     <ul className="statList__list">
-                      {
-                        router.query.leaderboard && JSON.parse(router.query.leaderboard).map((player, index) => (
-                          <li key={'player-' + index} className={`statList__item ${index === 3 ? 'statList__item--active' : ''}`}>
-                            <p className="statList__rank">{index + 1}</p>
-                            <p className="statList__nft">{player.address}</p> 
-                            <p className="statList__score">{player.amount}</p>
-                          </li>
-                        ))
-                      }
+                        {account?.address ? (leaderboard.map((player, index) => (
+                                <li
+                                    key={player.address}
+                                    className={`statList__item ${
+                                        account?.address === player.address
+                                            ? "statList__item--active"
+                                            : ""
+                                    }`}
+                                >
+                                    <p className="statList__rank">
+                                        {index + 1}
+                                    </p>
+                                    <p className="statList__nft">
+                                        {player.address}
+                                    </p>
+                                    <p className="statList__score">
+                                        {player.amount}
+                                    </p>
+                                </li>
+                            ))
+                        ) : (
+                            <li className="statList__loading">Loading...</li>
+                        )}
                     </ul>
                 </div>
-                <a onClick={() => payDividends()} className="btn btn--center" >
+                <a onClick={payDividends} className="btn btn--center">
                     Claim Rewards
                 </a>
-                <a onClick={() => {router.push('/dashboard')}} className="btn btn--center" style={{ marginTop: '2rem' }}>
+                <a
+                    onClick={() => router.push("/dashboard")}
+                    className="btn btn--center"
+                    style={{ marginTop: "2rem" }}
+                >
                     Dashboard
                 </a>
-
             </main>
         </div>
-    )
+    );
 }

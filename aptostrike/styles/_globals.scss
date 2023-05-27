@@ -18,13 +18,8 @@
 body {
     position: relative;
 	min-width: 320px;
-	//min-height: auto;
-	//width: 100vw;
     min-height: 100vh;
 	background-position: center;
-	//background-repeat: no-repeat;
-	background-size: cover;
-	background-image: url(../public/img/bg.jpg);
 	background-color: #130d27;
 	color: #FFFFFF;
 	font-family: $font-sci-fi;
@@ -139,6 +134,12 @@ select {
 	}
 }
 
+.tooltip {
+	&::before {
+		z-index: -1 !important;
+	}
+}
+
 
 .btn {
 	display: flex;
@@ -167,7 +168,9 @@ select {
 	}
 
 	&:disabled {
-		opacity: 50%;
+		background-color: rgba(80, 89, 164, 0.45);
+		border: 2px solid rgba(161, 168, 188, 0.68);
+		color: rgba(191, 197, 217, 0.45);
 		cursor: not-allowed;
 	}
 
@@ -198,6 +201,11 @@ select {
 
 }
 
+.bg-image-wrapper {
+	position: fixed;
+	z-index: -1;
+	inset: 0;
+}
 
 .link {
 	color: #FFFFFF;

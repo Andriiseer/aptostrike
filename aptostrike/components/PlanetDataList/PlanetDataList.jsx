@@ -15,7 +15,7 @@ export function PlanetDataList({ className='', mintHash }) {
 
     const calculatedPlanetFeatures = useMemo(
         () => (isLoaded ? planetFeatures : DEFAULT_PLANET_FEATURES),
-        [isLoaded, mintHash]
+        [isLoaded, planetFeatures]
     );
 
     return (

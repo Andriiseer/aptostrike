@@ -19,7 +19,7 @@
 		color: #9D7C14;
 		font-size: 20px;
 		line-height: 133%;
-		cursor: pointer;
+		cursor: default;
 		
 		&--active {
 			background-color: rgba(157, 124, 20, 0.85);
@@ -33,12 +33,11 @@
 		&:not(:first-child) {
 			clip-path: polygon(100% 100%, 40px 100%, 0 0, 120px 0px);
 			transform: translateX(-40px);
-			cursor: no-drop; // Temporary
 		}
 	}
 
 	&__content {
-		padding: 50px 35px 35px;
+		padding: 2.5rem;
 		background: #27254950;
 	}
 
@@ -46,7 +45,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 35px;
+		// margin-bottom: 35px;
 	}
 
 	&__price {

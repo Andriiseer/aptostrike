@@ -7,7 +7,6 @@ const usePlanet = (mintHash, planetCanvasRef) => {
     useEffect(() => {
         if (!mintHash) return;
 
-        localStorage.setItem("hash", mintHash);
         const planet = new PlanetRender(mintHash, planetCanvasRef);
         planet.initAnimation();
 

@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { useState } from 'react'
 import { Header } from '@components/Header/Header';
 import { Planet } from '@components/Planet/Planet';
@@ -8,7 +8,7 @@ import { StatList } from '@components/StatList/StatList';
 
 
 export default function Leaderboard() {
-    const [hash, setHash] = useState('opKnKPLvxekWsTEZqXUEqmsTCN95tHMtiKVnTbN7qX2uersNYE2');
+    const [hash, setHash] = useState(null);
 
     return (
         <>
@@ -26,12 +26,12 @@ export default function Leaderboard() {
                     </div>
 
                     <div className="leaderBoard__center">
-                        <Planet mintHash={hash} />
-                        <a className="leaderBoard__btn btn btn--center" href="#">BUY</a>
+                        <Planet mintHash={ hash } />
+                        <a className="leaderBoard__btn btn btn--center">BUY</a>
                     </div>
                     
                     <div className="leaderBoard__right">
-                        <PlanetDataList mintHash={hash} />
+                        <PlanetDataList mintHash={ hash } />
                     </div>
 
                     <div className="leaderBoard__bg">
