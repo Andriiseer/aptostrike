@@ -2,7 +2,7 @@ const fetchContractServers = async () => {
     return [
         {
             "manager": "tz1QeiXZZmeigHxjqgzrg5XuQiZtQejLYzkM",
-            "server_url": "localhost:8080",
+            "server_url": "server.aptostrike.space",
             "rooms": {},
             "players": [],
             "name": "Test-server-FRA",
@@ -11,7 +11,7 @@ const fetchContractServers = async () => {
         },
         {
             "manager": "tz1QeiXZZmeigHxjqgzrg5XuQiZtQejLYzkM",
-            "server_url": "localhost:8080",
+            "server_url": "server.aptostrike.space",
             "rooms": {},
             "players": [],
             "name": "Test-server-NYC",
